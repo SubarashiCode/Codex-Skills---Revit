@@ -1,0 +1,4 @@
+interface:
+  display_name: "Revit Palettes"
+  short_description: "Build Revit dockable/floating palettes."
+  default_prompt: "Use this skill when building or fixing Revit API add-ins that create ribbon buttons, dockable panes, WPF palettes, Family Editor fallbacks, deployment manifests, or signing/publisher behavior."
