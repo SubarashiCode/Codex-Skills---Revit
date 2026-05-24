@@ -91,4 +91,26 @@ Get-AuthenticodeSignature .\Deploy\...\Addin.dll
 
 Fixing this requires signing the DLL with a code-signing certificate trusted by Windows. For local testing, a current-user self-signed code-signing cert can work, but adding it to `Trusted Root Certification Authorities` and `Trusted Publishers` is a persistent trust-store change. Get explicit user approval before creating/trusting such a certificate.
 
+When approved, a local signing workflow can:
+
+1. Create or reuse a current-user code-signing certificate with subject `CN=Ahmed Abdalla`.
+2. Import the public certificate into Current User `Root` and `TrustedPublisher`.
+3. Sign the deployed DLL with SHA256:
+
+```powershell
+Set-AuthenticodeSignature -FilePath .\Deploy\Revit2025_DockableSyntax\SpecialistSyntax.dll -Certificate $cert -HashAlgorithm SHA256
+```
+
+4. Verify the exact deployed DLL:
+
+```powershell
+Get-AuthenticodeSignature .\Deploy\Revit2025_DockableSyntax\SpecialistSyntax.dll
+```
+
+Known local dev certificate from the Specialist Syntax project:
+
+- Subject: `CN=Ahmed Abdalla`
+- Thumbprint: `846A0EDCE79E387A9D6A24B05D0B852EF8DA3812`
+- Verified status after signing: `Valid`
+
 For public distribution, recommend a commercial code-signing certificate.
