@@ -29,29 +29,26 @@ Create an `IExternalApplication` that:
 
 Use generated WPF drawing icons when no asset exists. Freeze `DrawingGroup`/`DrawingImage` instances.
 
-## Family Editor Compatibility
+## Docking Behavior
 
-Dockable panes can fail or behave differently in Family Editor. Commands that show palettes should be resilient:
+Use Revit's native `DockablePane` for any palette that must dock, redock, tab behind Properties/Project Browser, or detect Revit docking zones. A plain WPF `Window` can float on top of Revit, but it will not participate in native Revit docking targets.
+
+Commands should show the native pane first in both project and Family Editor contexts:
 
 ```csharp
-Document? document = commandData.Application.ActiveUIDocument?.Document;
-if (document?.IsFamilyDocument == true)
-{
-    FloatingPalette.Show(commandData.Application);
-    return Result.Succeeded;
-}
-
 try
 {
     commandData.Application.GetDockablePane(App.PaneId).Show();
+    return Result.Succeeded;
 }
-catch
+catch (Exception exception)
 {
-    FloatingPalette.Show(commandData.Application);
+    message = $"Unable to open the native Revit dockable palette. {exception.Message}";
+    return Result.Failed;
 }
 ```
 
-The floating fallback should be a single reusable WPF `Window`, owned by `UIApplication.MainWindowHandle`, and should activate an existing instance instead of opening duplicates.
+Avoid silent fallback to a floating WPF window unless the user explicitly accepts losing native Revit docking. If a prior version used a floating pane or Revit persisted a bad pane placement, change the `DockablePaneId` GUID to reset the stored Revit pane state and let `DockPosition.Right` apply again.
 
 ## WPF Resize Rules
 
